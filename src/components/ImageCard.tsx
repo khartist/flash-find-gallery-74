@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageItem } from "@/hooks/useImageStore";
 import { Card } from "@/components/ui/card";
@@ -43,8 +43,16 @@ const ImageCard = ({ image, onRemove }: ImageCardProps) => {
             <X className="h-4 w-4" />
           </Button>
           
-          <div className="text-white text-sm font-medium truncate">
-            {image.file.name}
+          <div className="text-white space-y-1">
+            <div className="text-sm font-medium truncate">
+              {image.file.name}
+            </div>
+            {image.description && (
+              <div className="flex items-center gap-1 text-xs">
+                <FileText className="h-3 w-3" />
+                <span className="line-clamp-2">{image.description}</span>
+              </div>
+            )}
           </div>
         </div>
       )}

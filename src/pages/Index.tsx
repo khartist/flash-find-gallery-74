@@ -18,6 +18,11 @@ const Index = () => {
 
   const noImagesUploaded = images.length === 0 && !searchQuery;
 
+  const handleImageUpload = (file: File, description: string) => {
+    addImage(file, description);
+    setShowUpload(false); // Hide upload form after successful upload
+  };
+
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
       {/* Header with app title */}
@@ -47,7 +52,7 @@ const Index = () => {
       {/* Upload area */}
       {showUpload && (
         <div className="animate-fade-in">
-          <ImageUpload onUpload={addImage} />
+          <ImageUpload onUpload={handleImageUpload} />
         </div>
       )}
 

@@ -9,6 +9,7 @@ export interface ImageItem {
   url: string;
   tags: string[];
   uploadDate: Date;
+  description: string; // Added description field
 }
 
 export interface TimelineGroup {
@@ -37,7 +38,7 @@ export function useImageStore() {
           // Create an empty blob with the correct type
           const emptyBlob = new Blob([], { type: 'image/png' });
           // Convert to File with the original name
-          return new File([emptyBlob], fileName, { type: 'image/png' });
+          return new File([emptyBlob], fileName || 'placeholder.png', { type: 'image/png' });
         };
         
         // For demo purposes, we'll use some placeholder tags since we can't restore the actual files
@@ -46,6 +47,7 @@ export function useImageStore() {
           url: meta.url || '/placeholder.svg',
           tags: meta.tags || [],
           uploadDate: new Date(meta.uploadDate),
+          description: meta.description || '', // Load description from localStorage
           // Create a placeholder File object
           file: createPlaceholderFile(meta.fileName || 'placeholder.png')
         }));
@@ -66,7 +68,8 @@ export function useImageStore() {
       url: img.url,
       tags: img.tags,
       uploadDate: img.uploadDate.toISOString(),
-      fileName: img.file.name
+      fileName: img.file.name,
+      description: img.description // Save description to localStorage
     }));
     
     localStorage.setItem('flashFindImages', JSON.stringify(imagesToSave));
@@ -114,7 +117,7 @@ export function useImageStore() {
     setTimelineGroups(timelineArray);
   }, [filteredImages]);
 
-  const addImage = (file: File) => {
+  const addImage = (file: File, description: string = '') => {
     // Generate a preview URL for the image
     const url = URL.createObjectURL(file);
     
@@ -126,7 +129,8 @@ export function useImageStore() {
       file,
       url,
       tags,
-      uploadDate: new Date()
+      uploadDate: new Date(),
+      description // Store the description provided by the user
     };
 
     setImages(prevImages => [...prevImages, newImage]);
