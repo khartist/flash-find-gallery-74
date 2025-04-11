@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { searchImages, generateTagsFromFilename } from '@/lib/imageSearch';
 
 export interface ImageItem {
   id: string;
@@ -23,12 +24,22 @@ export function useImageStore() {
         // In a real app, we'd use a proper backend storage solution
         const savedImagesMeta = JSON.parse(savedImagesJson);
         
+        // Create a placeholder File object since we can't restore the actual file
+        const createPlaceholderFile = (fileName: string) => {
+          // Create an empty blob with the correct type
+          const emptyBlob = new Blob([], { type: 'image/png' });
+          // Convert to File with the original name
+          return new File([emptyBlob], fileName, { type: 'image/png' });
+        };
+        
         // For demo purposes, we'll use some placeholder tags since we can't restore the actual files
         const demoImages = savedImagesMeta.map((meta: any) => ({
-          ...meta,
-          uploadDate: new Date(meta.uploadDate),
-          // In a real app, we'd fetch the actual files from storage
+          id: meta.id,
           url: meta.url || '/placeholder.svg',
+          tags: meta.tags || [],
+          uploadDate: new Date(meta.uploadDate),
+          // Create a placeholder File object
+          file: createPlaceholderFile(meta.fileName || 'placeholder.png')
         }));
         
         setImages(demoImages);
@@ -60,19 +71,7 @@ export function useImageStore() {
       return;
     }
 
-    const query = searchQuery.toLowerCase();
-    const filtered = images.filter(image => {
-      // Check if search term matches any tag
-      const tagsMatch = image.tags.some(tag => 
-        tag.toLowerCase().includes(query)
-      );
-      
-      // Check if search term matches filename
-      const filenameMatch = image.file.name.toLowerCase().includes(query);
-      
-      return tagsMatch || filenameMatch;
-    });
-
+    const filtered = searchImages(images, searchQuery);
     setFilteredImages(filtered);
   }, [searchQuery, images]);
 
@@ -80,18 +79,8 @@ export function useImageStore() {
     // Generate a preview URL for the image
     const url = URL.createObjectURL(file);
     
-    // Extract basic tags from filename (simple demo implementation)
-    const filename = file.name.toLowerCase();
-    const fileExtension = filename.split('.').pop() || '';
-    const filenameWithoutExtension = filename.replace(`.${fileExtension}`, '');
-    
-    // Split by common separators and filter out empty strings
-    const baseTags = filenameWithoutExtension
-      .split(/[-_.\s]/)
-      .filter(tag => tag.length > 0);
-    
-    // Add file type as a tag
-    const tags = [...baseTags, fileExtension];
+    // Extract tags from filename
+    const tags = generateTagsFromFilename(file.name);
     
     const newImage: ImageItem = {
       id: crypto.randomUUID(),
