@@ -3,6 +3,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageItem } from "@/hooks/useImageStore";
+import { Card } from "@/components/ui/card";
 
 interface ImageCardProps {
   image: ImageItem;
@@ -19,8 +20,8 @@ const ImageCard = ({ image, onRemove }: ImageCardProps) => {
   };
 
   return (
-    <div 
-      className="image-card group aspect-square bg-muted"
+    <Card 
+      className="relative overflow-hidden group aspect-square bg-muted"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -47,7 +48,7 @@ const ImageCard = ({ image, onRemove }: ImageCardProps) => {
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

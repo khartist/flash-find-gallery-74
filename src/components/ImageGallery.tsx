@@ -30,8 +30,8 @@ const ImageGallery = ({ images, onRemoveImage, emptyContent }: ImageGalleryProps
 
   return (
     <div className="space-y-4 w-full">
-      <ScrollArea className="h-full w-full">
-        <div className={`image-grid ${isMobile ? 'gap-2' : 'gap-4'}`}>
+      <ScrollArea className="h-full max-h-[80vh] w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {images.map((image) => (
             <ImageCard 
               key={image.id} 

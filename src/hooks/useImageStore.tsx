@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { searchImages, generateTagsFromFilename } from '@/lib/imageSearch';
+import { format } from 'date-fns';
 
 export interface ImageItem {
   id: string;
@@ -10,10 +11,17 @@ export interface ImageItem {
   uploadDate: Date;
 }
 
+export interface TimelineGroup {
+  date: string;
+  formattedDate: string;
+  images: ImageItem[];
+}
+
 export function useImageStore() {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [filteredImages, setFilteredImages] = useState<ImageItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [timelineGroups, setTimelineGroups] = useState<TimelineGroup[]>([]);
 
   // Load images from localStorage on component mount
   useEffect(() => {
@@ -75,6 +83,37 @@ export function useImageStore() {
     setFilteredImages(filtered);
   }, [searchQuery, images]);
 
+  // Group images by date for timeline view
+  useEffect(() => {
+    // Sort images by date (newest first)
+    const sortedImages = [...filteredImages].sort((a, b) => 
+      b.uploadDate.getTime() - a.uploadDate.getTime()
+    );
+    
+    // Group by date (YYYY-MM-DD)
+    const groups: Record<string, ImageItem[]> = {};
+    
+    sortedImages.forEach(image => {
+      const dateKey = format(image.uploadDate, 'yyyy-MM-dd');
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(image);
+    });
+    
+    // Convert to array of timeline groups
+    const timelineArray: TimelineGroup[] = Object.keys(groups).map(dateKey => {
+      const date = new Date(dateKey);
+      return {
+        date: dateKey,
+        formattedDate: format(date, 'MMMM d, yyyy'),
+        images: groups[dateKey]
+      };
+    });
+    
+    setTimelineGroups(timelineArray);
+  }, [filteredImages]);
+
   const addImage = (file: File) => {
     // Generate a preview URL for the image
     const url = URL.createObjectURL(file);
@@ -99,6 +138,7 @@ export function useImageStore() {
 
   return {
     images: filteredImages,
+    timelineGroups,
     addImage,
     removeImage,
     searchQuery,
