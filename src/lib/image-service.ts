@@ -68,7 +68,7 @@ export const imageService = {
   updateImage: async (
     id: string,
     data: { description?: string; tags?: string[] }
-  ): Promise<ApiResponse<ImageApiItem>> {
+  ): Promise<ApiResponse<ImageApiItem>> => {
     return apiClient.patch<ImageApiItem>(API_PATHS.IMAGE(id), data);
   },
 
