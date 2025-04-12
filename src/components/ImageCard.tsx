@@ -4,6 +4,7 @@ import { X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageItem } from "@/hooks/useImageStore";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface ImageCardProps {
   image: ImageItem;
@@ -13,17 +14,23 @@ interface ImageCardProps {
 const ImageCard = ({ image, onRemove }: ImageCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate();
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
     onRemove(image.id);
   };
 
+  const handleClick = () => {
+    navigate(`/image/${image.id}`);
+  };
+
   return (
     <Card 
-      className="relative overflow-hidden group aspect-square bg-muted"
+      className="relative overflow-hidden group aspect-square bg-muted cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
     >
       <img
         src={image.url}
