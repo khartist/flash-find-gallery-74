@@ -33,66 +33,66 @@ const Statistics = ({ images }: StatisticsProps) => {
   }, [images]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="p-2 bg-purple-100 rounded-lg dark:bg-purple-900/20">
-              <ImageIcon className="w-5 h-5 text-purple-500 dark:text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Images</p>
-              <h3 className="text-2xl font-bold text-purple-500 dark:text-purple-400">
-                {stats.totalImages}
-              </h3>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="p-2 bg-blue-100 rounded-lg dark:bg-blue-900/20">
-              <Tags className="w-5 h-5 text-blue-500 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Tags</p>
-              <h3 className="text-2xl font-bold text-blue-500 dark:text-blue-400">
-                {stats.totalTags}
-              </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <ImageIcon className="w-6 h-6 text-purple-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Images</p>
+                <h3 className="text-2xl font-bold">{stats.totalImages}</h3>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="p-2 bg-green-100 rounded-lg dark:bg-green-900/20">
-              <Clock className="w-5 h-5 text-green-500 dark:text-green-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Recent</p>
-              <h3 className="text-2xl font-bold text-green-500 dark:text-green-400">
-                {stats.recentUploads}
-              </h3>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Tags className="w-6 h-6 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Tags</p>
+                <h3 className="text-2xl font-bold">{stats.totalTags}</h3>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="p-2 bg-orange-100 rounded-lg dark:bg-orange-900/20">
-              <ChartBar className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Clock className="w-6 h-6 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Recent Uploads</p>
+                <h3 className="text-2xl font-bold">{stats.recentUploads}</h3>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Avg Tags</p>
-              <h3 className="text-2xl font-bold text-orange-500 dark:text-orange-400">
-                {stats.avgTagsPerImage}
-              </h3>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <ChartBar className="w-6 h-6 text-orange-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Avg Tags/Image</p>
+                <h3 className="text-2xl font-bold">{stats.avgTagsPerImage}</h3>
+              </div>
             </div>
           </div>
         </CardContent>
