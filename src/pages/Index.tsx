@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import ImageUpload from "@/components/ImageUpload";
 import ImageGallery from "@/components/ImageGallery";
 import TimelineView from "@/components/TimelineView";
+import Statistics from "@/components/Statistics";
 import { useImageStore } from "@/hooks/useImageStore";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -48,6 +48,9 @@ const Index = () => {
           </Button>
         </div>
       </header>
+
+      {/* Statistics Section */}
+      {!noImagesUploaded && <Statistics images={images} />}
 
       {/* Upload area */}
       {showUpload && (
