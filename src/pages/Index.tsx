@@ -1,7 +1,5 @@
-
 import { useState, useMemo } from "react";
 import { useImageStore } from "@/hooks/useImageStore";
-import { searchImages } from "@/lib/imageSearch";
 import ImageGallery from "@/components/ImageGallery";
 import TimelineView from "@/components/TimelineView";
 import ImageUpload from "@/components/ImageUpload";
@@ -12,35 +10,27 @@ import { Button } from "@/components/ui/button";
 import { LayoutGrid, LayoutList } from "lucide-react";
 
 export default function Index() {
-  const { images, addImage, removeImage } = useImageStore();
+  const { images, searchImages, removeImage } = useImageStore();
   const [viewMode, setViewMode] = useState<"grid" | "timeline">("grid");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredImages = useMemo(() => {
-    return searchImages(images, searchTerm);
-  }, [images, searchTerm]);
-
+  const filteredImages = searchImages(searchTerm);
   const timelineGroups = useMemo(() => {
-    const groups: { [key: string]: { date: string; images: any[] } } = {};
+    const groups: { [key: string]: { date: Date; images: any[] } } = {};
 
     filteredImages.forEach((image) => {
-      const date = new Date(image.uploadDate);
-      const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const date = new Date(image.uploadDate.toDate().toDateString());
+      const dateKey = date.toISOString();
 
       if (!groups[dateKey]) {
-        groups[dateKey] = { 
-          date: dateKey, 
-          images: [] 
-        };
+        groups[dateKey] = { date: date, images: [] };
       }
       groups[dateKey].images.push(image);
     });
 
-    return Object.values(groups).sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    }).map(group => ({
+    return Object.values(groups).sort((a, b) => b.date.getTime() - a.date.getTime()).map(group => ({
       ...group,
-      formattedDate: new Date(group.date).toLocaleDateString(undefined, {
+      formattedDate: group.date.toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -55,7 +45,7 @@ export default function Index() {
       <main className="container mx-auto px-4 pt-20">
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <ImageUpload onUpload={addImage} />
+            <ImageUpload />
             <div className="flex items-center gap-2">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
