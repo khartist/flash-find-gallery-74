@@ -27,9 +27,11 @@ const Index = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
-      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white/50 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-photo-blue">FlashFind Gallery</h1>
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-photo-blue to-blue-600 bg-clip-text text-transparent">
+            FlashFind Gallery
+          </h1>
           <p className="text-muted-foreground">Store and search your photos easily</p>
         </div>
         
@@ -72,12 +74,12 @@ const Index = () => {
       {/* View mode selection */}
       {!noImagesUploaded && (
         <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)} className="w-full">
-          <TabsList className="grid w-48 grid-cols-2">
-            <TabsTrigger value="grid" className="flex items-center gap-1">
+          <TabsList className="grid w-48 grid-cols-2 bg-white/50 backdrop-blur-sm shadow-sm">
+            <TabsTrigger value="grid" className="flex items-center gap-1 data-[state=active]:shadow-sm data-[state=active]:bg-white">
               <Grid className="h-4 w-4" />
               <span>Grid</span>
             </TabsTrigger>
-            <TabsTrigger value="timeline" className="flex items-center gap-1">
+            <TabsTrigger value="timeline" className="flex items-center gap-1 data-[state=active]:shadow-sm data-[state=active]:bg-white">
               <CalendarDays className="h-4 w-4" />
               <span>Timeline</span>
             </TabsTrigger>
@@ -88,15 +90,18 @@ const Index = () => {
       {/* Gallery or empty state */}
       <div className="min-h-[60vh]">
         {noImagesUploaded ? (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <div className="bg-primary/10 p-5 rounded-full mb-4">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center bg-white/50 backdrop-blur-sm rounded-lg shadow-md p-8 transition-all duration-300 hover:shadow-lg">
+            <div className="bg-primary/10 p-5 rounded-full mb-4 transition-transform hover:scale-110">
               <Search className="h-10 w-10 text-primary" />
             </div>
-            <h2 className="text-2xl font-semibold mb-2">Your gallery is empty</h2>
+            <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-photo-blue to-blue-600 bg-clip-text text-transparent">
+              Your gallery is empty
+            </h2>
             <p className="text-muted-foreground mb-6 max-w-md">
               Upload your first photos to start building your searchable gallery
             </p>
-            <Button size="lg" onClick={() => setShowUpload(true)}>
+            <Button size="lg" onClick={() => setShowUpload(true)} 
+              className="transition-all duration-300 hover:shadow-lg hover:scale-105">
               <PlusCircle className="mr-2 h-5 w-5" />
               Upload Photos
             </Button>

@@ -83,7 +83,7 @@
   }
   
   .image-card {
-    @apply relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg;
+    @apply relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/50 backdrop-blur-sm border border-white/20;
   }
   
   .image-card img {
@@ -92,5 +92,17 @@
   
   .image-card:hover img {
     @apply scale-105;
+  }
+
+  .glass-effect {
+    @apply bg-white/50 backdrop-blur-sm border border-white/20;
+  }
+
+  .hover-scale {
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-105;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-photo-blue to-blue-600 bg-clip-text text-transparent;
   }
 }

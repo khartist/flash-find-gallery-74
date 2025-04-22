@@ -34,64 +34,64 @@ const Statistics = ({ images }: StatisticsProps) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card>
+      <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/50 backdrop-blur-sm border border-white/20">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="p-2 bg-purple-100 rounded-lg transition-colors group-hover:bg-purple-200">
                 <ImageIcon className="w-6 h-6 text-purple-500" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Images</p>
-                <h3 className="text-2xl font-bold">{stats.totalImages}</h3>
+                <h3 className="text-2xl font-bold text-purple-600">{stats.totalImages}</h3>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/50 backdrop-blur-sm border border-white/20">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-lg transition-colors group-hover:bg-blue-200">
                 <Tags className="w-6 h-6 text-blue-500" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Tags</p>
-                <h3 className="text-2xl font-bold">{stats.totalTags}</h3>
+                <h3 className="text-2xl font-bold text-blue-600">{stats.totalTags}</h3>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/50 backdrop-blur-sm border border-white/20">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="p-2 bg-green-100 rounded-lg transition-colors group-hover:bg-green-200">
                 <Clock className="w-6 h-6 text-green-500" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Recent Uploads</p>
-                <h3 className="text-2xl font-bold">{stats.recentUploads}</h3>
+                <h3 className="text-2xl font-bold text-green-600">{stats.recentUploads}</h3>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105 bg-white/50 backdrop-blur-sm border border-white/20">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
-              <div className="p-2 bg-orange-100 rounded-lg">
+              <div className="p-2 bg-orange-100 rounded-lg transition-colors group-hover:bg-orange-200">
                 <ChartBar className="w-6 h-6 text-orange-500" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Avg Tags/Image</p>
-                <h3 className="text-2xl font-bold">{stats.avgTagsPerImage}</h3>
+                <h3 className="text-2xl font-bold text-orange-600">{stats.avgTagsPerImage}</h3>
               </div>
             </div>
           </div>
