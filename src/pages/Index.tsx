@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import SearchBar from "@/components/SearchBar";
 import ImageUpload from "@/components/ImageUpload";
 import ImageGallery from "@/components/ImageGallery";
@@ -7,7 +9,7 @@ import Statistics from "@/components/Statistics";
 import { useImageStore } from "@/hooks/useImageStore";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PlusCircle, Search, Grid, CalendarDays } from "lucide-react";
+import { PlusCircle, Search, Grid, CalendarDays, BarChart2 } from "lucide-react";
 
 type ViewMode = "grid" | "timeline";
 
@@ -20,12 +22,11 @@ const Index = () => {
 
   const handleImageUpload = (file: File, description: string) => {
     addImage(file, description);
-    setShowUpload(false); // Hide upload form after successful upload
+    setShowUpload(false);
   };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
-      {/* Header with app title */}
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-photo-blue">FlashFind Gallery</h1>
@@ -46,6 +47,15 @@ const Index = () => {
             {showUpload ? "Cancel" : <PlusCircle className="mr-2 h-4 w-4" />}
             {!showUpload && "Upload"}
           </Button>
+
+          {!noImagesUploaded && (
+            <Link to="/stats">
+              <Button variant="outline" className="flex items-center gap-2">
+                <BarChart2 className="h-4 w-4" />
+                Stats
+              </Button>
+            </Link>
+          )}
         </div>
       </header>
 
