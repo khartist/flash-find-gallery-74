@@ -1,5 +1,5 @@
-
 import type { ImageItem } from "../hooks/useImageStore";
+import { defaultConfig } from "./api-client";
 
 /**
  * Search through images based on a text query
@@ -27,6 +27,48 @@ export function searchImages(images: ImageItem[], query: string): ImageItem[] {
 
     return tagMatches || filenameMatches;
   });
+}
+
+/**
+ * Search type enum for the different search methods
+ */
+export enum SearchType {
+  LOCAL = "local",
+  SEMANTIC = "semantic",
+  IMAGE = "image",
+  VOICE = "voice"
+}
+
+/**
+ * Semantic search through the backend API
+ * @param query The search query
+ * @param limit Maximum number of results to return (default: 10)
+ * @returns Promise with image URLs
+ */
+export async function semanticSearch(query: string, limit: number = 10): Promise<string[]> {
+  if (!query.trim()) {
+    return [];
+  }
+
+  try {
+    const url = `${defaultConfig.baseUrl}/search/text?query=${encodeURIComponent(query)}&limit=${limit}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.image_urls || [];
+  } catch (error) {
+    console.error('Semantic search failed:', error);
+    return [];
+  }
 }
 
 /**

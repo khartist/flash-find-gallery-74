@@ -1,4 +1,3 @@
-
 /**
  * API Client Library
  * A centralized library for handling API requests
@@ -20,8 +19,8 @@ export interface ApiResponse<T = any> {
 }
 
 // Default configuration
-const defaultConfig: ApiConfig = {
-  baseUrl: '/api',
+export const defaultConfig: ApiConfig = {
+  baseUrl: 'http://localhost:8000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -47,9 +46,15 @@ export class ApiClient {
       ...options.headers,
     });
 
+    if (options.body instanceof FormData) {
+      headers.delete('Content-Type');
+    }
+
     const requestOptions: RequestInit = {
       ...options,
       headers,
+      mode: 'cors',
+      credentials: 'include',
     };
 
     // Add timeout handling
@@ -124,6 +129,7 @@ export class ApiClient {
 
 // Export a default client instance
 export const apiClient = new ApiClient();
+
 
 // Helper hook to create API client with custom config
 export function createApiClient(config: Partial<ApiConfig> = {}) {

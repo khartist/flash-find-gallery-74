@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ImageItem } from "@/hooks/useImageStore";
 import ImageCard from "./ImageCard";
@@ -37,12 +36,13 @@ const ImageGallery = ({ images, onRemoveImage, emptyContent }: ImageGalleryProps
               key={image.id} 
               image={image} 
               onRemove={onRemoveImage} 
+              onSelect={() => setSelectedImage(image)}
             />
           ))}
         </div>
       </ScrollArea>
       
-      {/* Image Preview Modal - in a real app, we would expand this */}
+      {/* Image Preview Modal */}
       {selectedImage && (
         <div 
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"

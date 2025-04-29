@@ -1,12 +1,14 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import SearchBar from "@/components/SearchBar";
 import ImageUpload from "@/components/ImageUpload";
 import ImageGallery from "@/components/ImageGallery";
 import TimelineView from "@/components/TimelineView";
 import Statistics from "@/components/Statistics";
 import { useImageStore } from "@/hooks/useImageStore";
+import { imageService } from "@/lib/image-service";
+import { SearchType } from "@/lib/imageSearch";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PlusCircle, Search, Grid, CalendarDays, BarChart2 } from "lucide-react";
@@ -14,16 +16,35 @@ import { PlusCircle, Search, Grid, CalendarDays, BarChart2 } from "lucide-react"
 type ViewMode = "grid" | "timeline";
 
 const Index = () => {
-  const { images, timelineGroups, addImage, removeImage, searchQuery, setSearchQuery } = useImageStore();
+  const { 
+    images, 
+    timelineGroups, 
+    addImage, 
+    removeImage, 
+    searchQuery, 
+    setSearchQuery, 
+    searchType, 
+    setSearchType, 
+    isLoading 
+  } = useImageStore();
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [isUploading, setIsUploading] = useState(false);
 
-  const noImagesUploaded = images.length === 0 && !searchQuery;
-
-  const handleImageUpload = (file: File, description: string) => {
-    addImage(file, description);
-    setShowUpload(false);
+  const handleImageUpload = (file: File, metadata: { description: string; category: string }) => {
+    try {
+      // Add the image with description and category
+      addImage(file, metadata.description, metadata.category);
+      toast.success(`Image '${file.name}' uploaded successfully.`);
+      imageService.uploadImage(file, metadata);
+      setShowUpload(false);
+    } catch (error) {
+      toast.error("Error uploading image. Please try again.");
+      console.error(error);
+    }
   };
+
+  const noImagesUploaded = images.length === 0;
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
@@ -37,6 +58,8 @@ const Index = () => {
           <SearchBar 
             value={searchQuery}
             onChange={setSearchQuery}
+            searchType={searchType}
+            onSearchTypeChange={setSearchType}
           />
           
           <Button 
@@ -50,59 +73,71 @@ const Index = () => {
 
           {!noImagesUploaded && (
             <Link to="/stats">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" size="icon">
                 <BarChart2 className="h-4 w-4" />
-                Stats
               </Button>
             </Link>
           )}
         </div>
       </header>
-
-      {/* Statistics Section */}
-      {!noImagesUploaded && <Statistics images={images} />}
-
-      {/* Upload area */}
+      
       {showUpload && (
-        <div className="animate-fade-in">
-          <ImageUpload onUpload={handleImageUpload} />
-        </div>
+        <ImageUpload 
+          onUpload={handleImageUpload}
+        />
       )}
-
-      {/* View mode selection */}
-      {!noImagesUploaded && (
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)} className="w-full">
-          <TabsList className="grid w-48 grid-cols-2">
-            <TabsTrigger value="grid" className="flex items-center gap-1">
-              <Grid className="h-4 w-4" />
-              <span>Grid</span>
-            </TabsTrigger>
-            <TabsTrigger value="timeline" className="flex items-center gap-1">
-              <CalendarDays className="h-4 w-4" />
-              <span>Timeline</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      )}
-
-      {/* Gallery or empty state */}
-      <div className="min-h-[60vh]">
+      
+      <div className="space-y-4">
         {noImagesUploaded ? (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <div className="bg-primary/10 p-5 rounded-full mb-4">
-              <Search className="h-10 w-10 text-primary" />
-            </div>
-            <h2 className="text-2xl font-semibold mb-2">Your gallery is empty</h2>
-            <p className="text-muted-foreground mb-6 max-w-md">
-              Upload your first photos to start building your searchable gallery
+          <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center rounded-lg border border-dashed">
+            <Search className="h-12 w-12 mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-medium mb-2">No images yet</h2>
+            <p className="text-muted-foreground mb-4">
+              Upload some images to get started with FlashFind Gallery
             </p>
-            <Button size="lg" onClick={() => setShowUpload(true)}>
-              <PlusCircle className="mr-2 h-5 w-5" />
-              Upload Photos
+            <Button 
+              onClick={() => setShowUpload(true)}
+              className="mt-2"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Upload Images
             </Button>
           </div>
         ) : (
           <>
+            <Tabs defaultValue="grid" className="w-full">
+              <div className="flex items-center justify-between">
+                <TabsList>
+                  <TabsTrigger 
+                    value="grid" 
+                    onClick={() => setViewMode("grid")}
+                  >
+                    <Grid className="mr-2 h-4 w-4" />
+                    Grid View
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="timeline" 
+                    onClick={() => setViewMode("timeline")}
+                  >
+                    <CalendarDays className="mr-2 h-4 w-4" />
+                    Timeline
+                  </TabsTrigger>
+                </TabsList>
+
+                {searchQuery && (
+                  <div className="text-sm text-muted-foreground">
+                    {isLoading ? (
+                      "Searching..."
+                    ) : (
+                      <>
+                        Found {images.length} result{images.length !== 1 ? 's' : ''} for "{searchQuery}"
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Tabs>
+            
             {viewMode === "grid" && (
               <ImageGallery 
                 images={images} 

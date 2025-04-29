@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Upload, Image, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,13 +6,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import {
+  SelectContent,
+	Select,
+  SelectItem,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select"
+ 
 
 interface ImageUploadProps {
-  onUpload: (file: File, description: string) => void;
+  onUpload: (file: File, metadata: { description: string; category: string }) => void;
 }
-
 interface UploadFormValues {
   description: string;
+  category: string;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload }) => {
@@ -24,6 +31,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload }) => {
   const form = useForm<UploadFormValues>({
     defaultValues: {
       description: '',
+      category: '',
     },
   });
 
@@ -66,7 +74,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload }) => {
       return;
     }
     
-    onUpload(selectedFile, values.description);
+    onUpload(selectedFile, {
+      description: values.description,
+      category: values.category,
+    });
     toast.success(`Image '${selectedFile.name}' uploaded successfully!`);
     
     // Reset the form
@@ -170,9 +181,40 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload }) => {
                           {...field}
                         />
                       </FormControl>
+    
                     </FormItem>
                   )}
                 />
+
+								<FormField
+									control={form.control}
+									name="category"
+									render={({ field }) => (
+									<FormItem>
+										<FormLabel>Category</FormLabel>
+											<FormControl>
+												<Select
+												defaultValue={field.value}
+												onValueChange={field.onChange}>
+													<SelectTrigger className="w-full">
+														<SelectValue placeholder="Select a category" />
+													</SelectTrigger>
+
+													<SelectContent>
+														<SelectItem value="natural">Natural</SelectItem>
+														<SelectItem value="people">People</SelectItem>
+														<SelectItem value="animal">Animal</SelectItem>
+														<SelectItem value="food">Food</SelectItem>
+														<SelectItem value="indoor">Indoor</SelectItem>
+														<SelectItem value="outdoor">Outdoor</SelectItem>
+													</SelectContent>
+												</Select>												
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+                
+                
                 
                 <div className="flex gap-2 justify-end">
                   <Button 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,9 +8,10 @@ import { useNavigate } from "react-router-dom";
 interface ImageCardProps {
   image: ImageItem;
   onRemove: (id: string) => void;
+  onSelect: () => void;
 }
 
-const ImageCard = ({ image, onRemove }: ImageCardProps) => {
+const ImageCard = ({ image, onRemove, onSelect }: ImageCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const ImageCard = ({ image, onRemove }: ImageCardProps) => {
   };
 
   const handleClick = () => {
-    navigate(`/image/${image.id}`);
+    onSelect();
   };
 
   return (
