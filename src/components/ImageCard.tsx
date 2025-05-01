@@ -22,7 +22,7 @@ const ImageCard = ({ image, onRemove, onSelect }: ImageCardProps) => {
   };
 
   const handleClick = () => {
-    onSelect();
+    navigate(`/image/${encodeURIComponent(image.file.name)}`);
   };
 
   return (

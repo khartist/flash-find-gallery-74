@@ -21,7 +21,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/image/:id" element={<ImageDetail />} />
+            <Route path="/image/:name" element={<ImageDetail />} />
             <Route path="/stats" element={<StatisticsPage />} />  {/* New route */}
             <Route path="*" element={<NotFound />} />
           </Routes>

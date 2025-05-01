@@ -43,7 +43,7 @@ export function useImageStore() {
       try {
         // Call the API to get all images
         const response = await imageService.getAllImages();
-        
+        // console.log('API response:', response);
         if (response.status >= 200 && response.status < 300 && Array.isArray(response.data)) {
           // Map API response to ImageItem format
           const apiImages = response.data.map((item: any) => {

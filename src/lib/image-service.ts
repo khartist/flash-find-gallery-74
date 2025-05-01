@@ -4,6 +4,10 @@
  */
 
 import { apiClient, ApiResponse } from './api-client';
+import { v5 as uuidv5 } from 'uuid';
+
+// Define the UUID namespace (using DNS as in backend)
+const UUID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'; // UUID namespace for DNS
 
 // Define image-related types
 export interface ImageApiItem {
@@ -24,9 +28,17 @@ export interface ImageSearchResponse {
 // Image service API paths
 const API_PATHS = {
   IMAGES: '/image/all',
-  IMAGE: (id: string) => `/images/${id}`,
+  IMAGE: (filename: string) => `/image/${generateUuidForFile(filename)}`,
   UPLOAD: '/upload/image',
   SEARCH_IMAGE: '/search/image',
+};
+
+/**
+ * Generate a UUID v5 for a file name
+ * This matches the backend's approach of using UUID5 with DNS namespace
+ */
+const generateUuidForFile = (fileName: string): string => {
+  return uuidv5(fileName, UUID_NAMESPACE);
 };
 
 // Image service methods
@@ -34,15 +46,19 @@ export const imageService = {
   /**
    * Get all images
    */
+  // Print the API path for debugging
   getAllImages: async (): Promise<ApiResponse<ImageApiItem[]>> => {
+    // console.log("Fetching all images from API:", API_PATHS.IMAGES);
     return apiClient.get<ImageApiItem[]>(API_PATHS.IMAGES);
   },
 
   /**
    * Get a single image by ID
    */
-  getImageById: async (filename: string): Promise<ApiResponse<ImageApiItem>> => {
-    console.log("Fetching image with ID:", filename);
+  getImageByName: async (filename: string): Promise<ApiResponse<ImageApiItem>> => {
+    // console.log("Fetching image with ID:", filename);
+    
+    // Generate UUID5 for the file name based on original file name
     return apiClient.get<ImageApiItem>(API_PATHS.IMAGE(filename));
   },
 
@@ -66,7 +82,7 @@ export const imageService = {
       
       formData.append('metadata_json', metadata_json);
 
-      console.log("formData:", formData);
+      // console.log("formData:", formData);
       
       // Use apiClient but ensure proper FormData handling by NOT setting Content-Type
       // Let the browser set Content-Type with proper boundary
@@ -75,7 +91,7 @@ export const imageService = {
         body: formData,
         headers: {
           // Override the default Content-Type in apiClient by setting it to undefined
-          'Content-Type': undefined,
+          // 'Content-Type': undefined,
           'Accept': 'application/json',
         },
       });
@@ -120,7 +136,7 @@ export const imageService = {
         body: formData,
         headers: {
           // Override the default Content-Type in apiClient by setting it to undefined
-          'Content-Type': undefined,
+          // 'Content-Type': undefined,
           'Accept': 'application/json',
         },
       });

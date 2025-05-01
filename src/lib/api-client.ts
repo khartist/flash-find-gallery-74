@@ -20,7 +20,7 @@ export interface ApiResponse<T = any> {
 
 // Default configuration
 export const defaultConfig: ApiConfig = {
-  baseUrl: 'http://localhost:8000',
+  baseUrl: 'http://localhost:8081',
   headers: {
     'Content-Type': 'application/json',
   },
