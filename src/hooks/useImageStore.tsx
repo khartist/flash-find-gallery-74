@@ -27,6 +27,7 @@ export function useImageStore() {
   const [searchType, setSearchType] = useState<SearchType>(SearchType.LOCAL);
   const [timelineGroups, setTimelineGroups] = useState<TimelineGroup[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeletingImage, setIsDeletingImage] = useState(false);
 
   // Create a placeholder File object since we can't restore the actual file
   const createPlaceholderFile = (fileName: string) => {
@@ -221,8 +222,33 @@ export function useImageStore() {
     setImages(prevImages => [...prevImages, newImage]);
   };
 
-  const removeImage = (id: string) => {
-    setImages(prevImages => prevImages.filter(img => img.id !== id));
+  const removeImage = async (id: string) => {
+    try {
+      setIsDeletingImage(true);
+      // Find the image by id
+      const imageToRemove = images.find(img => img.id === id);
+      
+      if (imageToRemove) {
+        // Call the API to delete the image
+        const fileName = imageToRemove.file.name;
+        const response = await imageService.deleteImage(fileName);
+        
+        if (response.status >= 200 && response.status < 300) {
+          // If API call was successful, remove from local state
+          setImages(prevImages => prevImages.filter(img => img.id !== id));
+          return true; // Return success indicator
+        } else {
+          console.error('Failed to delete image from API:', response);
+          throw new Error(`API returned status ${response.status}`);
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+      throw error; // Re-throw to let caller handle the error
+    } finally {
+      setIsDeletingImage(false);
+    }
   };
 
   return {
@@ -234,6 +260,7 @@ export function useImageStore() {
     setSearchQuery,
     searchType,
     setSearchType,
-    isLoading
+    isLoading,
+    isDeletingImage
   };
 }

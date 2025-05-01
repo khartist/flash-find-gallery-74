@@ -114,8 +114,9 @@ export const imageService = {
   /**
    * Delete an image
    */
-  deleteImage: async (id: string): Promise<ApiResponse<void>> => {
-    return apiClient.delete(API_PATHS.IMAGE(id));
+  deleteImage: async (filename: string): Promise<ApiResponse<void>> => {
+    // Use the image filename to generate the UUID for deletion
+    return apiClient.delete(API_PATHS.IMAGE(filename));
   },
 
   /**

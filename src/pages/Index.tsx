@@ -25,7 +25,8 @@ const Index = () => {
     setSearchQuery, 
     searchType, 
     setSearchType, 
-    isLoading 
+    isLoading,
+    isDeletingImage
   } = useImageStore();
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");

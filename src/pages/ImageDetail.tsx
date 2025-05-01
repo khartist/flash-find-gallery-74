@@ -4,19 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Info, Calendar, FileText, X, Tag, RefreshCcw, ZoomIn, ZoomOut, Download, Loader2, Maximize, Minimize } from "lucide-react";
+import { ArrowLeft, Info, Calendar, FileText, X, Tag, RefreshCcw, ZoomIn, ZoomOut, Download, Loader2, Maximize, Minimize, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useImageStore, ImageItem } from "@/hooks/useImageStore";
 import { useToast } from "@/hooks/use-toast";
 import { imageService } from "@/lib/image-service";
 import { defaultConfig } from "@/lib/api-client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const ImageDetail = () => {
   const { name } = useParams<{ name: string }>();
   const decodedName = name ? decodeURIComponent(name) : "";
   
   const navigate = useNavigate();
-  const { images } = useImageStore();
+  const { images, removeImage } = useImageStore();
   const [image, setImage] = useState<ImageItem | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -28,6 +38,8 @@ const ImageDetail = () => {
   const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -179,6 +191,47 @@ const ImageDetail = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!image) return;
+
+    try {
+      setIsDeleting(true);
+      if (images.find(img => img.id === image.id)) {
+        const result = await removeImage(image.id);
+        
+        if (result) {
+          toast({
+            title: "Image deleted",
+            description: `Successfully deleted ${image.file.name}`,
+          });
+          navigate('/');
+        }
+      } else {
+        const response = await imageService.deleteImage(image.file.name);
+        
+        if (response.status >= 200 && response.status < 300) {
+          toast({
+            title: "Image deleted",
+            description: `Successfully deleted ${image.file.name}`,
+          });
+          navigate('/');
+        } else {
+          throw new Error(`API returned status ${response.status}`);
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description: error instanceof Error ? error.message : "Failed to delete the image",
+        variant: "destructive"
+      });
+      console.error('Failed to delete image:', error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   const handleRetry = () => {
     if (retries < 3 && decodedName) {
       setRetries(prev => prev + 1);
@@ -312,6 +365,17 @@ const ImageDetail = () => {
         <h1 className="text-xl font-medium truncate max-w-lg">{image.file.name}</h1>
         
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setShowDeleteConfirm(true)}
+            title="Delete image"
+            className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+            disabled={isDeleting}
+          >
+            {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            <span className="sr-only">Delete image</span>
+          </Button>
           <Button variant="outline" size="icon" onClick={downloadImage} title="Download image">
             <Download className="h-4 w-4" />
             <span className="sr-only">Download image</span>
@@ -527,6 +591,34 @@ const ImageDetail = () => {
           )}
         </div>
       </div>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Image</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this image? This action cannot be undone and the image will be permanently removed from the server.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

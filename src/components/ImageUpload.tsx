@@ -112,12 +112,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload }) => {
 
   return (
     <div>
+      <label htmlFor="file-upload" className="hidden">
+        Upload File
+      </label>
       <input
+        id="file-upload"
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/*"
         className="hidden"
+        title="Upload an image file"
       />
       
       {!selectedFile ? (
