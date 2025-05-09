@@ -29,14 +29,35 @@ export function searchImages(images: ImageItem[], query: string): ImageItem[] {
   });
 }
 
-/**
- * Search type enum for the different search methods
- */
+// Define the search types available in our application
 export enum SearchType {
-  LOCAL = "local",
-  SEMANTIC = "semantic",
-  IMAGE = "image",
-  VOICE = "voice"
+  LOCAL = 'local',      // Local search - no API call
+  SEMANTIC = 'semantic', // Semantic search using AI
+  IMAGE = 'image',      // Search using an image as input
+  VOICE = 'voice'       // Search using voice/audio input
+}
+
+export interface SearchResult {
+  id: string;
+  url: string;
+  title?: string;
+  description?: string;
+  date?: Date;
+  tags?: string[];
+}
+
+/**
+ * Get fake search results (for development)
+ */
+export function getFakeSearchResults(query: string, count: number = 10): SearchResult[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `result-${i}`,
+    url: `https://source.unsplash.com/random?${query}&sig=${i}`,
+    title: `Result ${i + 1} for "${query}"`,
+    description: `This is a sample result for "${query}"`,
+    date: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
+    tags: ['sample', 'demo', query]
+  }));
 }
 
 /**

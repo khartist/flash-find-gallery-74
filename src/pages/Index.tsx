@@ -26,7 +26,8 @@ const Index = () => {
     searchType, 
     setSearchType, 
     isLoading,
-    isDeletingImage
+    isDeletingImage,
+    performSemanticSearch // Add the new function from useImageStore
   } = useImageStore();
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -45,6 +46,20 @@ const Index = () => {
     }
   };
 
+  // Handle search operations based on the search type
+  const handleSearch = (query: string, type: SearchType) => {
+    setSearchQuery(query);
+    setSearchType(type);
+    
+    // For semantic search, call the performSemanticSearch function
+    if (type === SearchType.SEMANTIC) {
+      toast.info("Performing AI-powered search...");
+      // Use the dedicated function to perform semantic search
+      performSemanticSearch(query);
+    }
+    // For other search types (LOCAL, IMAGE, VOICE), the automatic search in useEffect will handle it
+  };
+
   const noImagesUploaded = images.length === 0;
 
   return (
@@ -61,6 +76,7 @@ const Index = () => {
             onChange={setSearchQuery}
             searchType={searchType}
             onSearchTypeChange={setSearchType}
+            onSearch={handleSearch}
           />
           
           <Button 

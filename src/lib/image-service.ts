@@ -11,11 +11,7 @@ const UUID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'; // UUID namespace
 
 // Define image-related types
 export interface ImageApiItem {
-//   id: string;
-//   url: string;
   filename: string;
-//   tags: string[];
-//   uploadDate: string;
   description?: string;
   category?: string;
 }
@@ -23,6 +19,16 @@ export interface ImageApiItem {
 // Define response type for image search
 export interface ImageSearchResponse {
   text: string[];
+}
+
+export interface SearchResponse {
+  status: number;
+  data?: any;
+  error?: string;
+}
+
+interface TextSearchResponse {
+  text?: string[];
 }
 
 // Image service API paths
@@ -41,109 +47,149 @@ const generateUuidForFile = (fileName: string): string => {
   return uuidv5(fileName, UUID_NAMESPACE);
 };
 
-// Image service methods
-export const imageService = {
+export class ImageService {
   /**
    * Get all images
    */
-  // Print the API path for debugging
-  getAllImages: async (): Promise<ApiResponse<ImageApiItem[]>> => {
-    // console.log("Fetching all images from API:", API_PATHS.IMAGES);
+  async getAllImages(): Promise<ApiResponse<ImageApiItem[]>> {
     return apiClient.get<ImageApiItem[]>(API_PATHS.IMAGES);
-  },
+  }
 
   /**
    * Get a single image by ID
    */
-  getImageByName: async (filename: string): Promise<ApiResponse<ImageApiItem>> => {
-    // console.log("Fetching image with ID:", filename);
-    
-    // Generate UUID5 for the file name based on original file name
+  async getImageByName(filename: string): Promise<ApiResponse<ImageApiItem>> {
     return apiClient.get<ImageApiItem>(API_PATHS.IMAGE(filename));
-  },
+  }
 
   /**
    * Upload a new image
    */
-  uploadImage: async (
+  async uploadImage(
     file: File,
     metadata: { description: string; category: string }
-  ): Promise<ApiResponse<ImageApiItem>> => {
+  ): Promise<ApiResponse<ImageApiItem>> {
     try {
-      // For file uploads, we use FormData
       const formData = new FormData();
       formData.append('file', file, file.name);
-      
-      // Format metadata as array with object as required by the API
-      const metadata_json = JSON.stringify([{
-        description: metadata.description,
-        category: metadata.category
-      }]);
-      
+
+      const metadata_json = JSON.stringify([
+        {
+          description: metadata.description,
+          category: metadata.category,
+        },
+      ]);
+
       formData.append('metadata_json', metadata_json);
 
-      // console.log("formData:", formData);
-      
-      // Use apiClient but ensure proper FormData handling by NOT setting Content-Type
-      // Let the browser set Content-Type with proper boundary
       return await apiClient.request<ImageApiItem>(API_PATHS.UPLOAD, {
         method: 'POST',
         body: formData,
         headers: {
-          // Override the default Content-Type in apiClient by setting it to undefined
-          // 'Content-Type': undefined,
           'Accept': 'application/json',
         },
       });
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error('Upload failed:', error);
       throw error;
     }
-  },
+  }
 
   /**
    * Update image metadata
    */
-  updateImage: async (
+  async updateImage(
     id: string,
     data: { description?: string; tags?: string[]; category?: string }
-  ): Promise<ApiResponse<ImageApiItem>> => {
+  ): Promise<ApiResponse<ImageApiItem>> {
     return apiClient.patch<ImageApiItem>(API_PATHS.IMAGE(id), data);
-  },
+  }
 
   /**
    * Delete an image
    */
-  deleteImage: async (filename: string): Promise<ApiResponse<void>> => {
-    // Use the image filename to generate the UUID for deletion
+  async deleteImage(filename: string): Promise<ApiResponse<void>> {
     return apiClient.delete(API_PATHS.IMAGE(filename));
-  },
+  }
 
   /**
-   * Search for images using an image file
+   * Search by text query
    */
-  searchByImage: async (
-    file: File,
-    limit: number = 5
-  ): Promise<ApiResponse<ImageSearchResponse>> => {
+  async searchByText(query: string): Promise<SearchResponse> {
     try {
-      // For file uploads, we use FormData
+      const response = await apiClient.get(`/search/text?query=${encodeURIComponent(query)}`);
+      return {
+        status: response.status,
+        data: response.data,
+      };
+    } catch (error: any) {
+      console.error('Text search error:', error);
+      return {
+        status: error.response?.status || 500,
+        error: error.response?.data?.detail || error.message || 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Search by image
+   */
+  async searchByImage(file: File): Promise<SearchResponse> {
+    try {
       const formData = new FormData();
       formData.append('file', file);
-      
-      // Use apiClient but ensure proper FormData handling by NOT setting Content-Type
-      return await apiClient.request<ImageSearchResponse>(`${API_PATHS.SEARCH_IMAGE}?limit=${limit}`, {
+
+      const response = await apiClient.post('/search/image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return {
+        status: response.status,
+        data: response.data,
+      };
+    } catch (error: any) {
+      console.error('Image search error:', error);
+      return {
+        status: error.response?.status || 500,
+        error: error.response?.data?.detail || error.message || 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Search by audio
+   */
+  async searchByAudio(audioBlob: Blob): Promise<SearchResponse> {
+    try {
+      const formData = new FormData();
+      // Change file parameter name from 'file' to explicit file parameter expected by API
+      formData.append('file', audioBlob, 'recording.wav');
+
+      // Use apiClient to ensure consistent error handling and headers
+      const response = await apiClient.request<{image_urls?: string[]}>('/search/audio', {
         method: 'POST',
         body: formData,
         headers: {
-          // Override the default Content-Type in apiClient by setting it to undefined
-          // 'Content-Type': undefined,
+          // Remove 'Content-Type' header to let the browser set it correctly with boundary
           'Accept': 'application/json',
         },
       });
-    } catch (error) {
-      console.error("Image search failed:", error);
-      throw error;
+
+      return {
+        status: response.status,
+        data: response.data,
+      };
+    } catch (error: any) {
+      console.error('Audio search error:', error);
+      return {
+        status: error.response?.status || 500,
+        error: error.response?.data?.detail || error.message || 'Unknown error',
+      };
     }
-  },
-};
+  }
+}
+
+// Export a singleton instance
+export const imageService = new ImageService();
