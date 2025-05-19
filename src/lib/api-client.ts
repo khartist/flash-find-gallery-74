@@ -97,28 +97,34 @@ export class ApiClient {
   async get<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
-
   async post<T = any>(endpoint: string, data: any, options: RequestInit = {}): Promise<ApiResponse<T>> {
+    // If data is FormData, don't stringify it
+    const body = data instanceof FormData ? data : JSON.stringify(data);
+    
     return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
-      body: JSON.stringify(data),
+      body,
     });
   }
-
   async put<T = any>(endpoint: string, data: any, options: RequestInit = {}): Promise<ApiResponse<T>> {
+    // If data is FormData, don't stringify it
+    const body = data instanceof FormData ? data : JSON.stringify(data);
+    
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
-      body: JSON.stringify(data),
+      body,
     });
   }
-
   async patch<T = any>(endpoint: string, data: any, options: RequestInit = {}): Promise<ApiResponse<T>> {
+    // If data is FormData, don't stringify it
+    const body = data instanceof FormData ? data : JSON.stringify(data);
+    
     return this.request<T>(endpoint, {
       ...options,
       method: 'PATCH',
-      body: JSON.stringify(data),
+      body,
     });
   }
 
